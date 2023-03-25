@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignIn</title>
+</head>
+
+<body>
+    <h1>SignIn</h1>
+    <hr>
+    <br>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required id="email" placeholder="Enter your email">
+    </div>
+    <br>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required id="password" placeholder="Enter password">
+    </div>
+    <br>
+    <div>
+        <button type="submit" id="submit">Sign In</button>
+    </div>
+    <br>
+    <div>
+        <span>Create a new account </span> <a href="./signUp.html">Sign Up</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded",  () => {
+
+            const submit = document.querySelector("#submit");
+
+            submit.addEventListener("click", async () => {
+                const email = document.querySelector("#email");
+                const password = document.querySelector("#password");
+                let user = {
+                    email: email.value,
+                    password: password.value
+                };
+                let request = await fetch("http://127.0.0.1:3326/api/v1/signin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(user)
+                })
+                console.log(request);
+                let message = await request.text();
+                alert(message);
+            })
+
+        })
+    </script>
+</body>
+
+</html>
