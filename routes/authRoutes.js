@@ -1,15 +1,14 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { validateName, validateEmail, validatePassword } = require("../utils/validators");
+const users = require("../models/userModel");
 
 const router = express.Router();
-
-let users = {};
 
 router.post("/signup", async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const doesUserExist = users.hasOwnProperty(email);
+        const doesUserExist = await users.findOne({ where: { email } });
 
         if (doesUserExist) {
             res.send("User already exists");
@@ -29,7 +28,9 @@ router.post("/signup", async (req, res) => {
 
         const ePassword = await bcrypt.hash(password, 10);
 
-        users[email] = { name, password: ePassword }
+        const saveToDB = { name, email, password: ePassword };
+
+        await users.create(saveToDB);
 
         res.send("User created");
 
@@ -41,16 +42,19 @@ router.post("/signup", async (req, res) => {
 
 router.post("/signin", async (req, res) => {
     try {
-        const {email, password} = req.body;
-        const doesUserExist = users.hasOwnProperty(email);
+        const { email, password } = req.body;
+        const doesUserExist = await users.findOne({ where: { email } });
 
-        if(!doesUserExist){
+        console.log(doesUserExist);
+        console.log(doesUserExist.password);
+
+        if (!doesUserExist) {
             res.send("User does not exist");
         }
 
-        const matchPassword = await bcrypt.compare(password, users[email].password);
+        const matchPassword = await bcrypt.compare(password, doesUserExist.password);
 
-        if(!matchPassword){
+        if (!matchPassword) {
             res.send("Password mismatch");
         }
 
